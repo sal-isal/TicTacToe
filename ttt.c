@@ -2,6 +2,29 @@
 #include <conio.h>
 #include <windows.h>
 #include <stdlib.h>
+#include <stdbool.h>
+
+void menu();
+void pilihMode(); //
+void pilihPapan();
+void caraBermain(); // sudah
+void skorTertinggi(); // belum
+void tentang(); // sudah
+void inputNama();
+
+
+typedef struct 
+{
+	char nama[20];
+	int score;
+	bool status;
+}Player;
+
+Player Pemain[2];
+
+
+int grid;
+
 
 void gotoxy(int x, int y) {
     COORD coord;
@@ -12,7 +35,7 @@ void gotoxy(int x, int y) {
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
-//procedure
+
 void menu(){
     system("CLS"); // clear screen
     system("COLOR F1");
@@ -25,7 +48,20 @@ void menu(){
 }
 
 void pilihMode(){
-	int pilihan;
+	int pilih;
+
+	gotoxy(15,0); printf("Pilih Mode");
+	gotoxy(0,2); printf("1. Lawan Player");
+	gotoxy(0,3); printf("2. Lawan Komputer");
+
+	if (pilih == 1){
+		inputNama()
+	}
+	
+	
+}
+
+void pilihPapan(){
 	
 	do{
 		system("CLS");
@@ -55,9 +91,14 @@ void pilihMode(){
 		gotoxy(37,9); printf("X X X X X X X");
 		
 		
-		gotoxy(0,12);printf("> Masukan Pilihan (1-3) : ");
-		scanf("%d", &pilihan);
-	}while(pilihan > 3);
+		gotoxy(0,12); printf("> Masukan Pilihan (1-3) : ");
+		scanf("%d", &grid);
+		if (grid > 3){
+			printf("> Pilih 1 - 3 !!!\n");
+			system("pause");
+		}
+		
+	}while(grid > 3);
 	
 }
 void bermain(){
