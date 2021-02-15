@@ -11,19 +11,36 @@ void caraBermain(); // sudah
 void skorTertinggi(); // belum
 void tentang(); // sudah
 void inputNama();
-
+void bermain();
 
 typedef struct 
 {
 	char nama[20];
 	int score;
-	bool status;
 }Player;
 
-Player Pemain[2];
+typedef struct
+{
+	bool status;
+	char level[10];
+	int score;
+}Komputer;
+
+typedef struct {
+	int pola;
+	char xy[9][9];
+	int waktu;
+} Kotak;
+
+Player User[2];
+Komputer bot = {};
+Kotak papan = {};
 
 
-int grid;
+int grid, 
+	gameOver = 0,
+	jumlahGiliran = 0,
+	riwayatKotak[50] = {0};
 
 
 void gotoxy(int x, int y) {
@@ -47,16 +64,58 @@ void menu(){
     printf("5. Keluar\n");
 }
 
+void inputNama(int index){
+	system("CLS");
+	gotoxy(0,1); printf("> Masukan Nama Pemain (Player ke-%d): ", index+1);
+	scanf("%s", &User[index].nama);
+}
+
+int pilihLevel(){
+	int pilihan;
+	
+	do{
+		system("cls");
+		gotoxy(15,0); printf("Pilih Kesulitan");
+		gotoxy(0,2); printf("1. Mudah");
+		gotoxy(0,3); printf("2. Sulit");
+		gotoxy(0,4); printf(">  Pilih Tingkat Kesulitan : ");
+		scanf("%d",&pilihan);
+//		if(pilihan > 0 && pilihan < 3){
+//			bot.active = true;
+//		}
+		if(pilihan > 2 || pilihan < 0){
+			printf("\n  Masukan pilihan antara 1 - 2 !!!");
+		}
+	}while(pilihan > 2 || pilihan < 0);
+}
+
 void pilihMode(){
 	int pilih;
 
-	gotoxy(15,0); printf("Pilih Mode");
-	gotoxy(0,2); printf("1. Lawan Player");
-	gotoxy(0,3); printf("2. Lawan Komputer");
+	do{
+		system("CLS");
+		gotoxy(15,0); printf("Pilih Mode");
+		gotoxy(0,2); printf("1. Lawan Player");
+		gotoxy(0,3); printf("2. Lawan Komputer");
+		gotoxy(0,4); printf(">  Pilih Mode : ");
 
-	if (pilih == 1){
-		inputNama()
-	}
+		scanf("%d", &pilih);
+		if (pilih == 1){
+			inputNama(0);
+			inputNama(1);
+			bermain();
+		}else if(pilih == 2){
+			inputNama(0);
+			pilihLevel();
+			bermain();
+		}
+
+		if (pilih > 2){
+			printf("> Pilih 1 - 2!!!\n");
+			system("pause");
+		}
+		
+	}while(pilih > 2);
 	
 	
 }
@@ -92,19 +151,142 @@ void pilihPapan(){
 		
 		
 		gotoxy(0,12); printf("> Masukan Pilihan (1-3) : ");
-		scanf("%d", &grid);
-		if (grid > 3){
+		scanf("%d", &papan.pola);
+		if (papan.pola > 3){
 			printf("> Pilih 1 - 3 !!!\n");
 			system("pause");
 		}
 		
-	}while(grid > 3);
+	}while(papan.pola > 3);
 	
 }
+
+int cekKotak(int pilih){
+	int i;
+	papan.pola = 3;
+	
+	for(i = 0; i < papan.pola*papan.pola; i++){
+		if(riwayatKotak[i] == pilih){
+			return 1;
+			break;
+		}
+	}
+	
+	return 0;
+}
+
+void papan1(){
+	
+	char simbol;
+	int player = 1,
+		pilih;
+	do{
+		
+		// tampil papan
+		player = (player % 2) ? 1 : 2;
+		simbol = (player == 1)	? 'X' : 'O';
+		
+		system("CLS");
+		gotoxy(15,0); printf("Papan 3x3");
+		gotoxy(10,2); printf("-------------------");
+		gotoxy(10,3); printf("|1 %c	|2 %c  |3 %c  |", papan.xy[0][0], papan.xy[0][1], papan.xy[0][2]);
+		gotoxy(10,4); printf("-------------------");
+		gotoxy(10,5); printf("|4 %c	|5 %c  |6 %c  |", papan.xy[1][0], papan.xy[1][1], papan.xy[1][2]);
+		gotoxy(10,6); printf("-------------------");
+		gotoxy(10,7); printf("|7 %c	|8 %c  |9 %c  |",papan.xy[2][0], papan.xy[2][1], papan.xy[2][2]);
+		gotoxy(10,8); printf("-------------------");
+		
+		// tampil lawan dan Score
+		gotoxy(35,4); printf("Player 1 [X]\t: %d", User[0].score);
+		if(bot.status == true){
+			gotoxy(35,3); printf("Lawan\t: Komputer (%s)", bot.level );
+			gotoxy(35,5); printf("Komputer [O]\t: %d", bot.score);
+			
+		}else{
+			gotoxy(35,3); printf("Lawan\t: Player ");
+			gotoxy(35,5); printf("Player 2 [O]\t: %d", User[1].score);
+		}
+		
+		// input no Kotak
+		gotoxy(0,9); printf(">  Player %d Masukan Nomor Kotak : ", player);
+		scanf("%d", &pilih);
+		// cek batas inputan
+		if(pilih < 1 || pilih > 9 ){
+			printf("\n > Masukan kotak 1 - 9 !");
+			system("pause");
+		// cek kotak
+		}else{
+			printf("%d", cekKotak(pilih));
+			if(cekKotak(pilih) == 1){				
+				printf("> Kotak yang dipilih sudah terisi, pilih kotak lain !");
+				system("pause");
+				}
+		// input no kotak ke papan
+			else{
+				// cari no papan
+				int i,j,k = 1;
+				for(i = 0; i < 3; i++){
+					for(j = 0; j < 3; j++){
+						if(pilih == k){
+							papan.xy[i][j] = simbol;
+							riwayatKotak[jumlahGiliran] = pilih;
+							jumlahGiliran++; player++;
+							goto mng;
+						}
+						k++;					
+					}
+					mng : break;
+				}
+			}		
+		// cek menang				
+		}
+	} while (gameOver == 0 || jumlahGiliran < 9);
+	
+}
+
+void papan2(){
+	system("CLS") ;
+	gotoxy(15,0);   printf("Papan 5x5");
+	gotoxy(10,3);   printf("|  1   |  2  |  3   |  4   |  5    |");
+	gotoxy(10,4);   printf("------------------------------------");
+	gotoxy(10,5);   printf("|  6   |  27 |  8   |  9   |  10   |");
+	gotoxy(10,6);   printf("------------------------------------");
+	gotoxy(10,7);   printf("|  11  |  12 |  13  |  14  |  15   |");
+	gotoxy(10,8);   printf("------------------------------------");
+	gotoxy(10,9);   printf("|  16  |  17 |  18  |  19  |  20   |");
+	gotoxy(10,10);  printf("------------------------------------");
+	gotoxy(10,11);  printf("|  21  |  22 |  23  |  24  |  25   |");
+}
+
+void papan3(){
+	system("CLS") ;
+	gotoxy(15,0);     printf("Papan 7x7");
+	gotoxy(10,3);     printf("|  1    |  2   |  3    |  4    |  5     |  6   |  7   |");
+	gotoxy(10,4);     printf("-------------------------------------------------------");
+	gotoxy(10,5);     printf("|  8    |  9   |  10   |  11   |  12    |  13  |  14  |");
+	gotoxy(10,6);     printf("-------------------------------------------------------");
+	gotoxy(10,7);     printf("|  15   |  16  |  17   |  18   |  19    |  20  |  21  |");
+	gotoxy(10,8);     printf("-------------------------------------------------------");
+	gotoxy(10,9);     printf("|  22   |  23  |  24   |  25   |  26    |  27  |  28  |");
+	gotoxy(10,10);    printf("-------------------------------------------------------");
+	gotoxy(10,11);    printf("|  29   |  30  |  31   |  32   |  33    |  34  |  35  |");
+	gotoxy(10,12);    printf("-------------------------------------------------------");
+	gotoxy(10,13);    printf("|  36   |  37  |  38   |  39   |  40    |  41  |  42  |");
+	gotoxy(10,14);    printf("-------------------------------------------------------");
+	gotoxy(10,15);    printf("|  43   |  44  |  45   |  46   |  47    |  48  |  49  |");
+}
+
 void bermain(){
 	system("CLS");
-	printf("INI BERMAIN\n");
-	
+
+	do{
+		switch(papan.pola){
+			case 1 : papan1(); break;
+//			case 2 : papan2(); break;
+//			case 3 : papan3(); break;
+		}
+	}
+	while(papan.pola < 3);
 }
 
 void caraBermain(){
@@ -128,19 +310,18 @@ void tentang(){
 	printf("Pemain tersebut yang memenangkan pertandingannya.\n");
 }
 
-//fungsi
+
 int main(){
     int pilih;
     char ulangi;
 
-	//repeat until
     do{
         menu();
-        printf("Pilih Menu dari [1-5] : ");
+        printf("\nPilih Menu dari [1-5] : ");
         scanf("%d", &pilih);
 
         switch (pilih){
-            case 1 : pilihMode(); break;
+            case 1 : papan1(); break;
             case 2 : caraBermain(); break;
             case 3 : skorTertinggi(); break;
             case 4 : tentang(); break;
