@@ -6,40 +6,42 @@
 #include <stdbool.h>
 
 void menu();
-void pilihMode();
-void pilihPapan();
+	void game();
+	
+	//modul setting
+	void pilihPapan();
+	void pilihMode();
+	void inputNama(int index);
+	void pilihRonde();
+	
+	//modul game berlanggsung	
+	void resetKotak(int nomor);
+	void resetSkor();
+	void tampilSkor();
+	void tampilGiliran(int giliran);
+	int isiAcak(int no);
+	bool isiKotak(int giliran,int kotak, int pilihan);
+	bool cekStatusKotak(int kotak);
+	bool gantiGiliran(int giliran);
+	bool cekGaris(int giliran,int grid);
+	void showJuara();
+	
+	// modul papan
+	void papan1();
+	void papan2();
+	void papan3();
+	
+	// modul waktu
+	int StartTime();
+	int EndTime();
+	
+	void gotoxy(int x, int y)
+
+void bermain();
 void caraBermain();
 void skorTertinggi();
 void tentang();
-void inputNama();
-void bermain();
-void gotoxy(int x, int y);
-void inputNama(int index);
-int pilihLevel();
-void pilihMode();
-void pilihPapan();
-void pilihRonde();
-int pilih();
-void resetKotak(int nomor);
-void resetSkor();
-void tampilSkor();
-void tampilGiliran(int giliran);
-int isiAcak(int no);
-bool isiKotak(int giliran,int kotak, int pilihan);
-bool cekStatusKotak(int kotak);
-bool gantiGiliran(int giliran);
-bool cekGaris(int giliran,int grid);
-void showJuara();
-void game();
-void papan1();
-void papan2();
-void papan3();
-void bermain();
-void caraBermain();
-void skorTertinggi();
-void tentang();
-int StartTime();
-int EndTime();
+
 
 
 typedef struct 
@@ -307,7 +309,6 @@ int EndTime() {
 
     return endInput;
 }
-
 
 bool isiKotak(int giliran,int grid,int pilihan){
 	int batasWaktuInput;
