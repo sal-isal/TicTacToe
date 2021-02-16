@@ -36,8 +36,7 @@ void menu();
 	int EndTime();
 	
 	void gotoxy(int x, int y)
-
-void bermain();
+	
 void caraBermain();
 void skorTertinggi();
 void tentang();
