@@ -1,0 +1,8 @@
+Cara Bermain
+1. Pada Halaman Menu Utama Pilih Start Game
+2. Masukan Inputan pilihan Grid, Level, Nama dan Ronde
+3. Setelah semua inputan terisi dengan benar maka game akan dimulai
+4. Permainan akan selalu dimulai oleh player X terlebih dahulu
+5. Player cukup menginputkan angka pada grid untuk mengisi grid
+6. Ronde akan berakhir jika salah satu player bisa menempatkan tanda dengan pola horizontal, vertikal atau diagonal
+7. Setelah ronde terakhir selesai maka game akan menampilkan perolehan akhir 
