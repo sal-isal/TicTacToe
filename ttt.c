@@ -2,6 +2,7 @@
 #include <conio.h>
 #include <windows.h>
 #include <stdlib.h>
+#include<time.h>
 #include <stdbool.h>
 
 void menu();
@@ -24,7 +25,7 @@ void resetSkor();
 void tampilSkor();
 void tampilGiliran(int giliran);
 int isiAcak(int no);
-bool isiKotak(int giliran,int kotak);
+bool isiKotak(int giliran,int kotak, int pilihan);
 bool cekStatusKotak(int kotak);
 bool gantiGiliran(int giliran);
 bool cekGaris(int giliran,int grid);
@@ -37,6 +38,8 @@ void bermain();
 void caraBermain();
 void skorTertinggi();
 void tentang();
+int StartTime();
+int EndTime();
 
 
 typedef struct 
@@ -267,16 +270,20 @@ void resetSkor(){
 void tampilSkor(){
 	gotoxy(35,2); printf("Skor");
 	if(bot.active == false){
-		gotoxy(35,3); printf("%s\t\t[X] : %d", User[0].nama, User[0].skor);
-		gotoxy(35,4); printf("%s\t\t[O] : %d", User[1].nama, User[1].skor);
+		gotoxy(35,0); printf("%s", User[0].nama);
+		gotoxy(45,0); printf(" [X] : %d", User[0].skor);
+		gotoxy(35,1); printf("%s", User[1].nama);
+		gotoxy(45,1); printf(" [O] : %d", User[1].skor);
 	}else{
-		gotoxy(35,3); printf("%s\t\t[X] : %d", User[0].nama, User[0].skor);
-		gotoxy(35,4); printf("Komputer\t[O] : %d", User[1].skor);
+		gotoxy(35,0); printf("%s", User[0].nama);
+		gotoxy(45,0); printf(" [X] : %d", User[0].skor);
+		gotoxy(35,1); printf("Komputer");
+		gotoxy(45,1); printf(" [O] : %d", User[1].skor);
 	}
 }
 
 void tampilGiliran(int giliran){
-	gotoxy(35,6); printf("Giliran %s", User[giliran].nama);
+	gotoxy(60,3); printf("Giliran %s", User[giliran].nama);
 }
 
 int isiAcak(int no){
@@ -287,26 +294,68 @@ int isiAcak(int no){
 	}
 }
 
-bool isiKotak(giliran,kotak){
-	int pilih,noKotak=1;
+int StartTime() {
+    clock_t startInput;
+    startInput = clock();
+
+    return startInput;
+}
+
+int EndTime() {
+    clock_t endInput;
+    endInput = clock();
+
+    return endInput;
+}
+
+
+bool isiKotak(int giliran,int grid,int pilihan){
+	int batasWaktuInput;
+	int pilih,noGrid=1,t;
 	bool errorPilih=false;
+	double waktuInput = 0;
+	
+	if(pilihan == 1){
+		batasWaktuInput = 10;
+	} else if(pilihan == 2){
+		batasWaktuInput = 5;
+	} else if(pilihan == 3){
+		batasWaktuInput = 3;
+	} else {
+		batasWaktuInput = 10;
+	}
+	
 	
 	if(bot.active == true && User[giliran].kunci == 1){
-		pilih = isiAcak(kotak);
+		pilih = isiAcak(grid);
 	}else{
-		gotoxy(0,10); printf("> Masukan nomor kotak yang akan diisi : ");
+		
+		t = StartTime();
+		
+		gotoxy(0,12); printf("Masukan nomor grid yang akan diisi : ");
 		scanf("%d",&pilih);
+		
+		t = EndTime() - t;
+		
+		waktuInput = ((double) t)/CLOCKS_PER_SEC;
+		
+		if(waktuInput>batasWaktuInput){
+			gotoxy(0,13); ("Anda Melebihi Batas Waktu Lebih Dari %d Detik, Giliran di Ganti",batasWaktuInput);
+			gotoxy(0,14); printf("\nWaktu Anda Adalah %2.f Detik", waktuInput);			
+			Sleep(3000);
+			return errorPilih;
+		}
 	}
 
-	switch(kotak){
+	switch(grid){
 		case 1:
 			if(pilih > 9 || pilih < 0){
 				errorPilih = true;
 			}else{
 				errorPilih = false;
 			}
-			for(i = 0; i < 3; i++){
-				for(j = 0; j < 3; j++){			
+			for(i=0;i<3;i++){
+				for(j=0;j<3;j++){			
 					if(pilih == papan.ordoStatus[i][j]){
 						errorPilih = true;
 					}else if(pilih == papan.ordoDone[i][j] && User[giliran].kunci == 0){
@@ -368,6 +417,8 @@ bool isiKotak(giliran,kotak){
 			}
 			break;
 	}
+	
+	
 
 	return errorPilih;
 }
@@ -544,19 +595,18 @@ void showJuara(){
 	char pilihan='N';
 
 	system("cls");
-	printf("||==========   Juara   ==========||\n");
+	gotoxy(15,0); printf("Juara");
 	
 	if(bot.active == true && (User[1].skor > User[0].skor)){
-		printf("Juaranya adalah : Komputer\n");
-		printf("Score           : %d - %d\n",User[1].skor,User[0].skor);
+		gotoxy(7,3); printf("Juaranya adalah : Komputer");
+		gotoxy(7,4); printf("Score           : %d - %d",User[1].skor,User[0].skor);
 	}else if(User[1].skor > User[0].skor){
-		printf("Juaranya adalah : %s\n",User[1].nama);
-		printf("Score           : %d - %d\n",User[1].skor,User[0].skor);
+		gotoxy(7,3); printf("Juaranya adalah : %s\n",User[1].nama);
+		gotoxy(7,4); printf("Score           : %d - %d\n",User[1].skor,User[0].skor);
 	}else{
-		printf("Juaranya adalah : %s\n",User[0].nama);
-		printf("Score           : %d - %d\n",User[0].skor,User[1].skor);
+		gotoxy(7,3); printf("Juaranya adalah : %s\n",User[0].nama);
+		gotoxy(7,4); printf("Score           : %d - %d\n",User[0].skor,User[1].skor);
 	}
-	printf("||================================||\n\n\n");
 
 }
 
@@ -608,46 +658,96 @@ void papan1(){
 			if(errorPilih==true){
 				gotoxy(0,11); printf("Nomor tidak ada atau sudah diisi! ");
 			}
-			errorPilih = isiKotak(giliran,1);
+			errorPilih = isiKotak(giliran,1,pilihan);
 		}while(errorPilih == true);
-		if(cekStatusKotak(1) == false)resetKotak(1); 
-		if(gantiGiliran(giliran) == true) giliran++;
-			else giliran--;
+		
+		if(cekStatusKotak(1) == false){
+			resetKotak(1);
+		}
+		
+		if(gantiGiliran(giliran) == true){
+			giliran++;
+		}else{
+			giliran--;
+		}
+		
 		if(cekGaris(giliran,1) == true)ronde++;
 	}while(ronde < papan.ronde);
 	showJuara(giliran);
 }
 
 void papan2(){
-	system("CLS") ;
-	gotoxy(15,0);   printf("Papan 5x5");
-	gotoxy(10,3);   printf("|  1   |  2  |  3   |  4   |  5    |");
-	gotoxy(10,4);   printf("------------------------------------");
-	gotoxy(10,5);   printf("|  6   |  27 |  8   |  9   |  10   |");
-	gotoxy(10,6);   printf("------------------------------------");
-	gotoxy(10,7);   printf("|  11  |  12 |  13  |  14  |  15   |");
-	gotoxy(10,8);   printf("------------------------------------");
-	gotoxy(10,9);   printf("|  16  |  17 |  18  |  19  |  20   |");
-	gotoxy(10,10);  printf("------------------------------------");
-	gotoxy(10,11);  printf("|  21  |  22 |  23  |  24  |  25   |");
+	int giliran=0,ronde=0;
+	bool errorPilih=false;
+
+	resetKotak(2);
+	resetSkor();
+	do{
+		do{
+			system("cls");
+			tampilSkor();
+			tampilGiliran(giliran);
+			gotoxy(13,1); printf("Ronde   : %d\n",ronde+1);
+			gotoxy(15,0); printf("Papan 5x5");		
+			
+			gotoxy(10,2); printf("---------------------------------");
+			gotoxy(10,3); printf("|1 %c	|2 %c   |3 %c   |4 %c  |5 %c  |", papan.xy[0][0], papan.xy[0][1], papan.xy[0][2], papan.xy[0][3], papan.xy[0][4]);
+			gotoxy(10,4); printf("|6 %c	|7 %c   |8 %c   |9 %c  |10 %c |",papan.xy[1][0], papan.xy[1][1], papan.xy[1][2], papan.xy[1][3], papan.xy[1][4]);
+			gotoxy(10,5); printf("|11 %c	|12 %c  |13 %c  |14 %c |15 %c |",papan.xy[2][0], papan.xy[2][1], papan.xy[2][2], papan.xy[2][3], papan.xy[2][4]);
+			gotoxy(10,6); printf("|16 %c	|17 %c  |18 %c  |19 %c |20 %c |",papan.xy[3][0], papan.xy[3][1], papan.xy[3][2], papan.xy[3][3], papan.xy[3][4]);
+			gotoxy(10,7); printf("|21 %c	|22 %c  |23 %c  |24 %c |25 %c |",papan.xy[4][0], papan.xy[4][1], papan.xy[4][2], papan.xy[4][3], papan.xy[4][4]);
+			gotoxy(10,8); printf("---------------------------------");
+			
+			if(errorPilih==true){
+				gotoxy(0,11); gotoxy(0,11); printf("Nomor tidak ada atau sudah diisi! ");
+			}
+			errorPilih = isiKotak(giliran,2,pilihan);
+			
+		}while(errorPilih == true);
+		if(cekStatusKotak(2) == false) resetKotak(2); 
+		if(gantiGiliran(giliran) == true) giliran++;
+			else giliran--;
+		if(cekGaris(giliran,2) == true)ronde++;
+	}while(ronde < papan.ronde);
+	showJuara();
 }
 
 void papan3(){
-	system("CLS") ;
-	gotoxy(15,0);     printf("Papan 7x7");
-	gotoxy(10,3);     printf("|  1    |  2   |  3    |  4    |  5     |  6   |  7   |");
-	gotoxy(10,4);     printf("-------------------------------------------------------");
-	gotoxy(10,5);     printf("|  8    |  9   |  10   |  11   |  12    |  13  |  14  |");
-	gotoxy(10,6);     printf("-------------------------------------------------------");
-	gotoxy(10,7);     printf("|  15   |  16  |  17   |  18   |  19    |  20  |  21  |");
-	gotoxy(10,8);     printf("-------------------------------------------------------");
-	gotoxy(10,9);     printf("|  22   |  23  |  24   |  25   |  26    |  27  |  28  |");
-	gotoxy(10,10);    printf("-------------------------------------------------------");
-	gotoxy(10,11);    printf("|  29   |  30  |  31   |  32   |  33    |  34  |  35  |");
-	gotoxy(10,12);    printf("-------------------------------------------------------");
-	gotoxy(10,13);    printf("|  36   |  37  |  38   |  39   |  40    |  41  |  42  |");
-	gotoxy(10,14);    printf("-------------------------------------------------------");
-	gotoxy(10,15);    printf("|  43   |  44  |  45   |  46   |  47    |  48  |  49  |");
+	int giliran=0,ronde=0;
+	bool errorPilih=false;
+
+	resetKotak(3);
+	resetSkor();
+	do{
+		do{
+			system("cls");
+			tampilSkor();
+			tampilGiliran(giliran);
+			gotoxy(13,1); printf("Ronde   : %d\n",ronde+1);
+			gotoxy(15,0); printf("Papan 7x7");
+			
+			gotoxy(10,2); printf("---------------------------------------------");
+			gotoxy(10,3); printf("|1 %c	|2 %c   |3 %c   |4 %c  |5 %c  |6 %c  |7 %c  |", papan.xy[0][0], papan.xy[0][1], papan.xy[0][2], papan.xy[0][3], papan.xy[0][4],papan.xy[0][5], papan.xy[0][6]);
+			gotoxy(10,4); printf("|8 %c	|9 %c   |10 %c  |11 %c |12 %c |13 %c |14 %c |", papan.xy[1][0], papan.xy[1][1], papan.xy[1][2], papan.xy[1][3], papan.xy[1][4],papan.xy[1][5], papan.xy[1][6]);
+			gotoxy(10,5); printf("|15 %c	|16 %c  |17 %c  |18 %c |19 %c |20 %c |21 %c |", papan.xy[2][0], papan.xy[2][1], papan.xy[2][2], papan.xy[2][3], papan.xy[2][4],papan.xy[2][5], papan.xy[2][6]);
+			gotoxy(10,6); printf("|22 %c	|23 %c  |24 %c  |25 %c |26 %c |27 %c |28 %c |", papan.xy[3][0], papan.xy[3][1], papan.xy[3][2], papan.xy[3][3], papan.xy[3][4],papan.xy[3][5], papan.xy[3][6]);
+			gotoxy(10,7); printf("|29 %c	|30 %c  |31 %c  |32 %c |33 %c |34 %c |35 %c |", papan.xy[4][0], papan.xy[4][1], papan.xy[4][2], papan.xy[4][3], papan.xy[4][4],papan.xy[4][5], papan.xy[4][6]);
+			gotoxy(10,8); printf("|36 %c	|37 %c  |38 %c  |39 %c |40 %c |41 %c |42 %c |", papan.xy[5][0], papan.xy[5][1], papan.xy[5][2], papan.xy[5][3], papan.xy[5][4],papan.xy[5][5], papan.xy[5][6]);
+			gotoxy(10,9); printf("|43 %c	|44 %c  |45 %c  |46 %c |47 %c |48 %c |49 %c |", papan.xy[6][0], papan.xy[6][1], papan.xy[6][2], papan.xy[6][3], papan.xy[6][4],papan.xy[6][5], papan.xy[6][6]);
+			gotoxy(10,10); printf("---------------------------------------------");
+			
+			if(errorPilih==true){
+				gotoxy(0,11); printf("Nomor tidak ada atau sudah diisi!\n");
+			} 
+			errorPilih = isiKotak(giliran,3,pilihan);
+			
+		}while(errorPilih == true);
+		if(cekStatusKotak (3) == false)resetKotak(3); 
+		if(gantiGiliran(giliran) == true) giliran++;
+			else giliran--;
+		if(cekGaris(giliran,3) == true)ronde++;
+	}while(ronde < papan.ronde);
+	showJuara();
 }
 
 void caraBermain(){
@@ -660,7 +760,15 @@ void caraBermain(){
 }
 
 void skorTertinggi(){
-
+	system("CLS");
+	gotoxy(15,0); printf("Skor Tertinggi");
+	if(User[0].skor > User[1].skor){		
+		gotoxy(0,2); printf("%s\t	: %d", User[0].nama, User[0].skor);
+		gotoxy(0,3); printf("%s\t	: %d", User[1].nama, User[1].skor);
+	}else{
+		gotoxy(0,2); printf("%s\t	: %d", User[1].nama, User[1].skor);
+		gotoxy(0,3); printf("%s\t	: %d", User[0].nama, User[0].skor);
+	}
 }
 
 void tentang(){
