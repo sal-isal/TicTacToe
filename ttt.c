@@ -1,9 +1,10 @@
-#include <stdio.h>
-#include <conio.h>
-#include <windows.h>
-#include <stdlib.h>
+#include<stdio.h>
+#include<ctype.h>
+#include<stdbool.h>
+#include<stdlib.h>
 #include<time.h>
-#include <stdbool.h>
+#include<string.h>
+#include<windows.h>
 
 void menu();
 	void game();
@@ -35,7 +36,7 @@ void menu();
 	int StartTime();
 	int EndTime();
 	
-	void gotoxy(int x, int y)
+	void gotoxy(int x, int y);
 	
 void caraBermain();
 void skorTertinggi();
@@ -53,9 +54,7 @@ typedef struct
 
 typedef struct
 {
-	bool status;
 	char level[10];
-	int skor;
 	bool active;
 }Komputer;
 
@@ -64,8 +63,6 @@ typedef struct {
 	char xy[9][9];
 	int ordoDone[9][9];
 	int ordoStatus[9][9];
-	bool status;
-	int waktu;
 	int ronde;
 } Kotak;
 
